@@ -16,14 +16,22 @@ Text Domain: ecoindex-badge
 function ecoindex_badge_render_column( $column_name, $post_id ) {
     if ( $column_name == 'Ecoindex' ) {
         $url = get_permalink( $post_id );
-        $theme = get_option( 'ecoindex_badge_theme' );
-        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . $url . '" alt="Ecoindex Badge" /></a>';
+        if ( empty( $url ) ) {
+            $url = home_url();
+        }
+        $theme = get_option('ecoindex_badge_data_theme', 'light');
+        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '/" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . $url . '/" alt="Ecoindex Badge" /></a>';
         echo $badge_code;
     }
     elseif ( $column_name == 'Mesurer' ) {
-        echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' . esc_url(get_permalink($post_id)) . '">Mesurer</button>';
+        $url = get_permalink( $post_id );
+        if ( empty( $url ) ) {
+            $url = home_url();
+        }
+        echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' . esc_url( $url ) . '">Mesurer</button>';
     }
 }
+
 
 function ecoindex_measure_click_handler() {
     $url = $_POST['url'];
@@ -86,6 +94,21 @@ function ecoindex_badge_settings_page() {
                 'posts_per_page' => -1,
                 'post_status' => 'publish'
             ));
+
+            // Obtenir l'ID de la page d'accueil
+            $front_page_id = get_option('page_on_front');
+            
+            // Si la page d'accueil est une page statique
+            if ( 'page' == get_option('show_on_front') && $front_page_id ) {
+                // Ajouter la page d'accueil à la liste
+                $pages[] = get_post($front_page_id);
+            } else { // Si la page d'accueil est la page des derniers articles
+                // Ajouter un faux objet pour représenter la page d'accueil
+                $home = new stdClass();
+                $home->post_title = 'Accueil';
+                $home->ID = get_option('page_for_posts');
+                $pages[] = $home;
+            }
             
             if (count($pages) > 0 || count($posts) > 0) {
         ?>
@@ -175,7 +198,7 @@ function ecoindex_badge_pages_content($column_name, $post_id) {
     if ($column_name == 'ecoindex_badge') {
         $url = get_permalink($post_id);
         $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '" alt="Ecoindex Badge" /></a>';
+        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '/" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '/" alt="Ecoindex Badge" /></a>';
         echo $badge;
     }
 }
@@ -191,7 +214,7 @@ function ecoindex_badge_posts_content($column_name, $post_id) {
     if ($column_name == 'ecoindex_badge') {
         $url = get_permalink($post_id);
         $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '" alt="Ecoindex Badge" /></a>';
+        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '/" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '/" alt="Ecoindex Badge" /></a>';
         echo $badge;
     }
 }
