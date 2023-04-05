@@ -11,18 +11,54 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: ecoindex-badge
 */
 
+
 // Affiche le contenu de la page de configuration pour le badge Ecoindex
-function ecoindex_badge_render_column($column_name, $post_id) {
-    if ($column_name == 'ecoindex_badge') {
-        $url = get_permalink($post_id);
-        $theme = get_option('ecoindex_badge_theme');
-        ?>
-        <a href="https://bff.ecoindex.fr/redirect/?url=<?php echo esc_attr($url); ?>" target="_blank">
-            <img src="https://bff.ecoindex.fr/badge/?theme=<?php echo esc_attr($theme); ?>&url=<?php echo esc_attr($url); ?>" alt="Ecoindex Badge" />
-        </a>
-        <?php
+function ecoindex_badge_render_column( $column_name, $post_id ) {
+    if ( $column_name == 'Ecoindex' ) {
+        $url = get_permalink( $post_id );
+        $theme = get_option( 'ecoindex_badge_theme' );
+        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . urlencode( $url ) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . urlencode( $url ) . '" alt="Ecoindex Badge" /></a>';
+        echo $badge_code;
+    }
+    elseif ( $column_name == 'Mesurer' ) {
+        echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' . esc_url(get_permalink($post_id)) . '">Mesurer</button>';
     }
 }
+
+function ecoindex_measure_click_handler() {
+    $url = $_POST['url'];
+    $width = 1920;
+    $height = 1080;
+
+    $response = wp_remote_post( 'https://bff.ecoindex.fr/api/tasks', array(
+        'body' => array(
+            'url' => $url,
+            'width' => $width,
+            'height' => $height
+        )
+    ) );
+    
+    if ( is_wp_error( $response ) ) {
+        $error_message = $response->get_error_message();
+        echo "Something went wrong: $error_message";
+        die();
+    } else {
+        $data = json_decode( wp_remote_retrieve_body( $response ) );
+        $taskId = $data;
+
+        echo $taskId;
+    }
+    die();
+}
+
+add_action( 'wp_ajax_ecoindex_measure', 'ecoindex_measure_click_handler' );
+add_action( 'wp_ajax_nopriv_ecoindex_measure', 'ecoindex_measure_click_handler' );
+
+function ecoindex_measure_scripts() {
+    wp_enqueue_script( 'ecoindex-measure', plugin_dir_url( __FILE__ ) . 'js/ecoindex-measure.js', array( 'jquery' ), '1.0.0', true );
+}
+add_action( 'wp_enqueue_scripts', 'ecoindex_measure_scripts' );
+
 
 function ecoindex_badge_settings_page() {
     ?>
@@ -50,7 +86,8 @@ function ecoindex_badge_settings_page() {
                     <th>Type</th>
                     <th>Titre</th>
                     <th>Lien</th>
-                    <th>Ecoindex Badge</th>
+                    <th>Ecoindex</th>
+                    <th>Mesurer</th>
                 </tr>
             </thead>
             <tbody>
@@ -59,7 +96,8 @@ function ecoindex_badge_settings_page() {
                     <td>Page</td>
                     <td><?php echo esc_html($page->post_title); ?></td>
                     <td><a href="<?php echo esc_url(get_permalink($page->ID)); ?>">Voir</a></td>
-                    <td><?php ecoindex_badge_render_column('ecoindex_badge', $page->ID); ?></td>
+                    <td><?php ecoindex_badge_render_column('Ecoindex', $page->ID); ?></td>
+                    <td><?php echo ecoindex_badge_render_column( 'Mesurer', $page->ID ); ?></td>
                 </tr>
                 <?php } ?>
                 <?php foreach ($posts as $post) { ?>
@@ -67,7 +105,8 @@ function ecoindex_badge_settings_page() {
                     <td>Article</td>
                     <td><?php echo esc_html($post->post_title); ?></td>
                     <td><a href="<?php echo esc_url(get_permalink($post->ID)); ?>">Voir</a></td>
-                    <td><?php ecoindex_badge_render_column('ecoindex_badge', $post->ID); ?></td>
+                    <td><?php ecoindex_badge_render_column('Ecoindex', $post->ID); ?></td>
+                    <td><?php echo ecoindex_badge_render_column( 'Mesurer', $post->ID ); ?></td>
                 </tr>
                 <?php } ?>
             </tbody>
