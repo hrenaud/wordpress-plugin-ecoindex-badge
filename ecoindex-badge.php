@@ -11,8 +11,16 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: ecoindex-badge
 */
 
+// Cette fonction ajoute un slash à la fin de l'URL si celui-ci n'existe pas.
+function add_trailing_slash( $url ) {
+    if ( substr( $url, -1 ) !== '/' ) {
+        $url .= '/';
+    }
+    return $url;
+}
 
-// Affiche le contenu de la page de configuration pour le badge Ecoindex
+
+// Cette fonction affiche soit un badge Ecoindex, soit un bouton "Mesurer" pour une colonne donnée dans une liste de publication WordPress.
 function ecoindex_badge_render_column( $column_name, $post_id ) {
     if ( $column_name == 'Ecoindex' ) {
         $url = get_permalink( $post_id );
@@ -20,7 +28,7 @@ function ecoindex_badge_render_column( $column_name, $post_id ) {
             $url = home_url();
         }
         $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '/" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . $url . '/" alt="Ecoindex Badge" /></a>';
+        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . add_trailing_slash( $url ) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . add_trailing_slash( $url ) . '" alt="Ecoindex Badge" /></a>';
         echo $badge_code;
     }
     elseif ( $column_name == 'Mesurer' ) {
@@ -28,11 +36,11 @@ function ecoindex_badge_render_column( $column_name, $post_id ) {
         if ( empty( $url ) ) {
             $url = home_url();
         }
-        echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' . esc_url( $url ) . '">Mesurer</button>';
+        echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' . add_trailing_slash( esc_url( $url ) ) . '">Mesurer</button>';
     }
 }
 
-
+// Cette fonction gère la requête AJAX pour envoyer les données de mesure de l'empreinte environnementale d'une page ou d'un article, en utilisant l'API Ecoindex. Les données envoyées sont l'URL de la page, la largeur et la hauteur de la fenêtre de visualisation, et la fonction renvoie l'ID de la tâche Ecoindex correspondante.
 function ecoindex_measure_click_handler() {
     $url = $_POST['url'];
     $width = $_POST['width'];
@@ -66,6 +74,7 @@ function ecoindex_measure_click_handler() {
 add_action( 'wp_ajax_ecoindex_measure', 'ecoindex_measure_click_handler' );
 add_action( 'wp_ajax_nopriv_ecoindex_measure', 'ecoindex_measure_click_handler' );
 
+// Cette fonction enregistre le script JavaScript qui permet de lancer une mesure Ecoindex pour chaque page ou article. Le script est localisé pour pouvoir envoyer des requêtes AJAX avec les paramètres nécessaires.
 function ecoindex_measure_scripts() {
     wp_enqueue_script( 'ecoindex-measure', plugin_dir_url( __FILE__ ) . 'js/ecoindex-measure.js', array( 'jquery' ), '1.0.0', true );
     wp_localize_script('ecoindex-measure', 'ecoindex_measure_params', array(
@@ -75,8 +84,7 @@ function ecoindex_measure_scripts() {
 }
 add_action( 'admin_enqueue_scripts', 'ecoindex_measure_scripts' );
 
-
-
+// Cette fonction génère la page des paramètres du plugin Ecoindex Badge, affiche une liste de toutes les pages et articles du site avec leur titre, leur lien, leur score Ecoindex et un bouton pour mesurer leur impact environnemental.
 function ecoindex_badge_settings_page() {
     ?>
     <div class="wrap">
@@ -169,23 +177,24 @@ function ecoindex_badge_data_theme_callback() {
     <?php
 }
 
-// Ajoute le badge Ecoindex en bas à gauche de chaque page du site
-function ecoindex_badge_add() {
-    $data_theme = get_option( 'ecoindex_badge_data_theme', 'light' );
-    echo '<div id="ecoindex-badge" data-theme="' . esc_attr( $data_theme ) . '"></div>';
-    echo '<script src="https://cdn.jsdelivr.net/gh/cnumr/ecoindex_badge@2/assets/js/ecoindex-badge.js" defer></script>';
-    echo '<style>#ecoindex-badge {position: fixed; bottom: 10px; left: 10px;}</style>';
-}
-add_action( 'wp_footer', 'ecoindex_badge_add' );
-
-
-
-
 // Ajoute une page de configuration pour le badge Ecoindex
 function ecoindex_badge_menu() {
     add_menu_page( 'Ecoindex Badge Settings', 'Ecoindex Badge', 'manage_options', 'ecoindex-badge-settings', 'ecoindex_badge_settings_page', 'dashicons-superhero' );
 }
 add_action( 'admin_menu', 'ecoindex_badge_menu' );
+
+
+// Ajoute le badge Ecoindex en bas à gauche de chaque page du site
+function ecoindex_badge_add() {
+    $data_theme = get_option( 'ecoindex_badge_data_theme', 'light' );
+    $theme = get_option( 'ecoindex_badge_theme' );
+    $url = home_url( $_SERVER['REQUEST_URI'] );
+    echo '<a id="ecoindex-badge" href="https://bff.ecoindex.fr/redirect/?url=' . add_trailing_slash( $url ) . '" target="_blank">';
+    echo '<img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . add_trailing_slash( $url ) . '" alt="Ecoindex Badge" />';
+    echo '</a>';
+    echo '<style>#ecoindex-badge {position: fixed; bottom: 10px; left: 10px;}</style>';
+}
+add_action( 'wp_footer', 'ecoindex_badge_add' );
 
 // Ajoute une colonne Ecoindex dans la liste des articles
 function ecoindex_badge_pages_column($columns) {
@@ -194,29 +203,33 @@ function ecoindex_badge_pages_column($columns) {
 }
 add_filter('manage_pages_columns', 'ecoindex_badge_pages_column');
 
+// Cette fonction affiche le badge Ecoindex sur les pages en utilisant l'URL de la page courante avec la gestion de l'ajout du slash final et du thème personnalisé défini dans les paramètres.
 function ecoindex_badge_pages_content($column_name, $post_id) {
-    if ($column_name == 'ecoindex_badge') {
+    if ($column_name == 'ecoindex_badge' && get_post_status($post_id) == 'publish') {
         $url = get_permalink($post_id);
         $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '/" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '/" alt="Ecoindex Badge" /></a>';
+        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . add_trailing_slash( $url ) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . add_trailing_slash( $url ) . '" alt="Ecoindex Badge" /></a>';
         echo $badge;
     }
 }
 add_action('manage_pages_custom_column', 'ecoindex_badge_pages_content', 10, 2);
 
+// La fonction "ecoindex_badge_posts_column" ajoute une colonne "Ecoindex" à la page d'administration des articles en utilisant le filtre "manage_posts_columns".
 function ecoindex_badge_posts_column($columns) {
     $columns['ecoindex_badge'] = 'Ecoindex';
     return $columns;
 }
 add_filter('manage_posts_columns', 'ecoindex_badge_posts_column');
 
+// Cette fonction ajoute le badge Ecoindex à la colonne 'Ecoindex' dans la liste des articles de l'interface d'administration WordPress.
 function ecoindex_badge_posts_content($column_name, $post_id) {
-    if ($column_name == 'ecoindex_badge') {
+    if ($column_name == 'ecoindex_badge' && get_post_status($post_id) == 'publish') {
         $url = get_permalink($post_id);
         $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '/" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '/" alt="Ecoindex Badge" /></a>';
+        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . add_trailing_slash( $url ) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . add_trailing_slash( $url ) . '" alt="Ecoindex Badge" /></a>';
         echo $badge;
     }
 }
 add_action('manage_posts_custom_column', 'ecoindex_badge_posts_content', 10, 2);
+
 
