@@ -11,6 +11,102 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: ecoindex-badge
 */
 
+if( ! class_exists( 'WP_List_Table' ) ) {
+    require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
+}
+
+// Class générant un tableau de boutons
+class Ecoindex_Badge_List_Table extends WP_List_Table {
+    function __construct(){
+        global $status, $page;
+
+            parent::__construct( array(
+                'singular'  => __( 'ecoindex_item', 'mylisttable' ),     //singular name of the listed records
+                'plural'    => __( 'ecoindex_items', 'mylisttable' ),   //plural name of the listed records
+                'ajax'      => false        //does this table support ajax?
+        ) );
+
+        add_action( 'admin_head', array( &$this, 'admin_header' ) );            
+
+    }
+
+    function get_columns(){
+        $columns = array(
+            'type'      => 'Type',
+            'titre'     => 'Titre',
+            'lien'      => 'Lien',
+            'ecoindex'  => 'Ecoindex',
+            'mesurer'   => 'Mesurer'
+        );
+        return $columns;
+        }
+
+    function prepare_items() {
+        $per_page = 10;
+        $current_page = $this->get_pagenum();
+        $pages = get_pages();
+        $posts = get_posts(array(
+            'post_type' => 'post',
+            'posts_per_page' => $per_page,
+            'paged' => $current_page,
+            'post_status' => 'publish'
+        ));
+
+        // Obtenir l'ID de la page d'accueil
+        $front_page_id = get_option('page_on_front');
+        
+        // Si la page d'accueil est une page statique
+        if ( 'page' == get_option('show_on_front') && $front_page_id ) {
+            // Ajouter la page d'accueil à la liste
+            $pages[] = get_post($front_page_id);
+        } else { // Si la page d'accueil est la page des derniers articles
+            // Ajouter un faux objet pour représenter la page d'accueil
+            $home = new stdClass();
+            $home->post_title = 'Accueil';
+            $home->ID = get_option('page_for_posts');
+            $pages[] = $home;
+        }
+
+        if (count($pages) > 0 || count($posts) > 0) {
+            $items = array_merge($pages, $posts);
+        }
+
+
+        $columns = $this->get_columns();
+        $hidden = array();
+        $sortable = array();
+        $this->_column_headers = array($columns, $hidden, $sortable);
+
+        $total_items = count( $items );
+        $found_data = array_slice( $items,( ( $current_page-1 )* $per_page ), $per_page );
+
+        $this->set_pagination_args( array(
+            'total_items' => $total_items,                  //WE have to calculate the total number of items
+            'per_page'    => $per_page                     //WE have to determine how many items to show on a page
+        ) );
+        $this->items = $found_data;
+
+    }
+
+    function column_default( $item, $column_name ) {
+        switch( $column_name ) { 
+            case 'type':
+                return get_post_type($item);
+            case 'titre':
+                return esc_html($item->post_title);
+            case 'lien':
+                return "<a href=" . esc_url(get_permalink($item->ID)) . ">Voir</a>";
+            case 'ecoindex':
+                return ecoindex_badge_render_column('Ecoindex', $item->ID);
+            case 'mesurer':
+                return  ecoindex_badge_render_column('Mesurer', $item->ID);
+            default:
+            return print_r( $item, true ) ; //Show the whole array for troubleshooting purposes
+        }
+    }
+
+}
+
 // Cette fonction ajoute un slash à la fin de l'URL si celui-ci n'existe pas.
 function add_trailing_slash( $url ) {
     if ( substr( $url, -1 ) !== '/' ) {
@@ -19,26 +115,6 @@ function add_trailing_slash( $url ) {
     return $url;
 }
 
-
-// Cette fonction affiche soit un badge Ecoindex, soit un bouton "Mesurer" pour une colonne donnée dans une liste de publication WordPress.
-function ecoindex_badge_render_column( $column_name, $post_id ) {
-    if ( $column_name == 'Ecoindex' ) {
-        $url = get_permalink( $post_id );
-        if ( empty( $url ) ) {
-            $url = home_url();
-        }
-        $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . add_trailing_slash( $url ) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . add_trailing_slash( $url ) . '" alt="Ecoindex Badge" /></a>';
-        echo $badge_code;
-    }
-    elseif ( $column_name == 'Mesurer' ) {
-        $url = get_permalink( $post_id );
-        if ( empty( $url ) ) {
-            $url = home_url();
-        }
-        echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' . add_trailing_slash( esc_url( $url ) ) . '">Mesurer</button>';
-    }
-}
 
 // Cette fonction gère la requête AJAX pour envoyer les données de mesure de l'empreinte environnementale d'une page ou d'un article, en utilisant l'API Ecoindex. Les données envoyées sont l'URL de la page, la largeur et la hauteur de la fenêtre de visualisation, et la fonction renvoie l'ID de la tâche Ecoindex correspondante.
 function ecoindex_measure_click_handler() {
@@ -84,8 +160,29 @@ function ecoindex_measure_scripts() {
 }
 add_action( 'admin_enqueue_scripts', 'ecoindex_measure_scripts' );
 
+// Cette fonction affiche soit un badge Ecoindex, soit un bouton "Mesurer" pour une colonne donnée dans une liste de publication WordPress.
+function ecoindex_badge_render_column( $column_name, $post_id ) {
+    if ( $column_name == 'Ecoindex' ) {
+        $url = get_permalink( $post_id );
+        if ( empty( $url ) ) {
+            $url = home_url();
+        }
+        $theme = get_option('ecoindex_badge_data_theme', 'light');
+        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . add_trailing_slash( $url ) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . add_trailing_slash( $url ) . '" alt="Ecoindex Badge" /></a>';
+        echo $badge_code;
+    }
+    elseif ( $column_name == 'Mesurer' ) {
+        $url = get_permalink( $post_id );
+        if ( empty( $url ) ) {
+            $url = home_url();
+        }
+        echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' . add_trailing_slash( esc_url( $url ) ) . '">Mesurer</button>';
+    }
+}
+
 // Cette fonction génère la page des paramètres du plugin Ecoindex Badge, affiche une liste de toutes les pages et articles du site avec leur titre, leur lien, leur score Ecoindex et un bouton pour mesurer leur impact environnemental.
 function ecoindex_badge_settings_page() {
+    $myListTable = new Ecoindex_Badge_List_Table();
     ?>
     <div class="wrap">
         <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -95,65 +192,10 @@ function ecoindex_badge_settings_page() {
             <?php submit_button(); ?>
         </form>
          <h2>Liste des pages et articles</h2>
-        <?php
-            $pages = get_pages();
-            $posts = get_posts(array(
-                'post_type' => 'post',
-                'posts_per_page' => -1,
-                'post_status' => 'publish'
-            ));
-
-            // Obtenir l'ID de la page d'accueil
-            $front_page_id = get_option('page_on_front');
-            
-            // Si la page d'accueil est une page statique
-            if ( 'page' == get_option('show_on_front') && $front_page_id ) {
-                // Ajouter la page d'accueil à la liste
-                $pages[] = get_post($front_page_id);
-            } else { // Si la page d'accueil est la page des derniers articles
-                // Ajouter un faux objet pour représenter la page d'accueil
-                $home = new stdClass();
-                $home->post_title = 'Accueil';
-                $home->ID = get_option('page_for_posts');
-                $pages[] = $home;
-            }
-            
-            if (count($pages) > 0 || count($posts) > 0) {
+         <?php
+            $myListTable->prepare_items(); 
+            $myListTable->display();
         ?>
-        <table class="wp-list-table widefat striped">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Titre</th>
-                    <th>Lien</th>
-                    <th>Ecoindex</th>
-                    <th>Mesurer</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($pages as $page) { ?>
-                <tr>
-                    <td>Page</td>
-                    <td><?php echo esc_html($page->post_title); ?></td>
-                    <td><a href="<?php echo esc_url(get_permalink($page->ID)); ?>">Voir</a></td>
-                    <td><?php ecoindex_badge_render_column('Ecoindex', $page->ID); ?></td>
-                    <td><?php echo ecoindex_badge_render_column( 'Mesurer', $page->ID ); ?></td>
-                </tr>
-                <?php } ?>
-                <?php foreach ($posts as $post) { ?>
-                <tr>
-                    <td>Article</td>
-                    <td><?php echo esc_html($post->post_title); ?></td>
-                    <td><a href="<?php echo esc_url(get_permalink($post->ID)); ?>">Voir</a></td>
-                    <td><?php ecoindex_badge_render_column('Ecoindex', $post->ID); ?></td>
-                    <td><?php echo ecoindex_badge_render_column( 'Mesurer', $post->ID ); ?></td>
-                </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-        <?php } else { ?>
-        <p>Aucune page ni article trouvé.</p>
-        <?php } ?>
     </div>
     <?php
 }
