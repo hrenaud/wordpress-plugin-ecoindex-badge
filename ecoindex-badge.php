@@ -17,7 +17,7 @@ function ecoindex_badge_render_column( $column_name, $post_id ) {
     if ( $column_name == 'Ecoindex' ) {
         $url = get_permalink( $post_id );
         $theme = get_option( 'ecoindex_badge_theme' );
-        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . urlencode( $url ) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . urlencode( $url ) . '" alt="Ecoindex Badge" /></a>';
+        $badge_code = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . $theme . '&url=' . $url . '" alt="Ecoindex Badge" /></a>';
         echo $badge_code;
     }
     elseif ( $column_name == 'Mesurer' ) {
@@ -27,28 +27,32 @@ function ecoindex_badge_render_column( $column_name, $post_id ) {
 
 function ecoindex_measure_click_handler() {
     $url = $_POST['url'];
-    $width = 1920;
-    $height = 1080;
+    $width = $_POST['width'];
+    $height = $_POST['height'];
 
-    $response = wp_remote_post( 'https://bff.ecoindex.fr/api/tasks', array(
-        'body' => array(
-            'url' => $url,
-            'width' => $width,
-            'height' => $height
-        )
-    ) );
+    $response = wp_remote_post('https://bff.ecoindex.fr/api/tasks', array(
+        'body' => json_encode(array(
+        'url' => $url,
+        'width' => $width,
+        'height' => $height,
+        )),
+        'headers' => array(
+        'Content-Type' => 'application/json',
+        ),
+    ));
     
     if ( is_wp_error( $response ) ) {
         $error_message = $response->get_error_message();
         echo "Something went wrong: $error_message";
-        die();
+        wp_die();
     } else {
+        // var_dump($response);
         $data = json_decode( wp_remote_retrieve_body( $response ) );
         $taskId = $data;
 
         echo $taskId;
     }
-    die();
+    wp_die();
 }
 
 add_action( 'wp_ajax_ecoindex_measure', 'ecoindex_measure_click_handler' );
@@ -56,8 +60,13 @@ add_action( 'wp_ajax_nopriv_ecoindex_measure', 'ecoindex_measure_click_handler' 
 
 function ecoindex_measure_scripts() {
     wp_enqueue_script( 'ecoindex-measure', plugin_dir_url( __FILE__ ) . 'js/ecoindex-measure.js', array( 'jquery' ), '1.0.0', true );
+    wp_localize_script('ecoindex-measure', 'ecoindex_measure_params', array(
+    'ajaxurl' => admin_url('admin-ajax.php'),
+    'nonce' => wp_create_nonce('ecoindex_measure_nonce')
+));
 }
-add_action( 'wp_enqueue_scripts', 'ecoindex_measure_scripts' );
+add_action( 'admin_enqueue_scripts', 'ecoindex_measure_scripts' );
+
 
 
 function ecoindex_badge_settings_page() {
@@ -166,7 +175,7 @@ function ecoindex_badge_pages_content($column_name, $post_id) {
     if ($column_name == 'ecoindex_badge') {
         $url = get_permalink($post_id);
         $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . urlencode($url) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . urlencode($url) . '" alt="Ecoindex Badge" /></a>';
+        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '" alt="Ecoindex Badge" /></a>';
         echo $badge;
     }
 }
@@ -182,7 +191,7 @@ function ecoindex_badge_posts_content($column_name, $post_id) {
     if ($column_name == 'ecoindex_badge') {
         $url = get_permalink($post_id);
         $theme = get_option('ecoindex_badge_data_theme', 'light');
-        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . urlencode($url) . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . urlencode($url) . '" alt="Ecoindex Badge" /></a>';
+        $badge = '<a href="https://bff.ecoindex.fr/redirect/?url=' . $url . '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' . urlencode($theme) . '&url=' . $url . '" alt="Ecoindex Badge" /></a>';
         echo $badge;
     }
 }
