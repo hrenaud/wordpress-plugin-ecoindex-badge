@@ -4,7 +4,7 @@ Plugin Name: Ecoindex Badge
 Plugin URI: https://mon-site.com/plugins/ecoindex-badge/
 Description: Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.
 Version: 1.0
-Author: Votre nom
+Author: Renaud Héluin @ NovaGaïa (http://greenit.fr)
 Author URI: https://ecoindex.fr/
 License: GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
