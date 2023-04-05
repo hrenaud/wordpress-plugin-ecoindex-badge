@@ -2,7 +2,7 @@
 /*
 Plugin Name: Ecoindex Badge
 Plugin URI: https://mon-site.com/plugins/ecoindex-badge/
-Description: Ce plugin ajoute le badge Ecoindex à la fin de votre site.
+Description: Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.
 Version: 1.0
 Author: Votre nom
 Author URI: https://ecoindex.fr/
@@ -106,6 +106,19 @@ class Ecoindex_Badge_List_Table extends WP_List_Table {
     }
 
 }
+
+// function my_add_menu_items(){
+//     add_menu_page( 'My Plugin List Table', 'My List Table Example', 'activate_plugins', 'my_list_test', 'my_render_list_page' );
+// }
+// add_action( 'admin_menu', 'my_add_menu_items' );
+
+// function my_render_list_page(){
+//   $myListTable = new Ecoindex_Badge_List_Table();
+//   echo '<div class="wrap"><h2>My List Table Test</h2>'; 
+//   $myListTable->prepare_items(); 
+//   $myListTable->display(); 
+//   echo '</div>'; 
+// }
 
 // Cette fonction ajoute un slash à la fin de l'URL si celui-ci n'existe pas.
 function add_trailing_slash( $url ) {
