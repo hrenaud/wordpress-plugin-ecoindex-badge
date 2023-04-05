@@ -234,7 +234,7 @@ function ecoindex_badge_data_theme_callback() {
 
 // Ajoute une page de configuration pour le badge Ecoindex
 function ecoindex_badge_menu() {
-    add_menu_page( 'Ecoindex Badge Settings', 'Ecoindex Badge', 'manage_options', 'ecoindex-badge-settings', 'ecoindex_badge_settings_page', 'dashicons-superhero' );
+    add_menu_page( 'Ecoindex Badge Settings', 'Ecoindex Badge', 'manage_options', 'ecoindex-badge', 'ecoindex_badge_settings_page', 'dashicons-superhero' );
 }
 add_action( 'admin_menu', 'ecoindex_badge_menu' );
 
