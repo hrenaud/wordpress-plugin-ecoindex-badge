@@ -1,0 +1,17 @@
+{
+  "name": "ecoindex-badge",
+  "version": "1.2.0",
+  "description": "Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.",
+  "main": "ecoindex-badge.php",
+  "repository": "https://github.com/hrenaud/wordpress-plugin-ecoindex-badge.git",
+  "author": "Renaud Heluin <renaud.heluin@novagaia.fr>",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "@prettier/plugin-php": "^0.19.4",
+    "prettier": "^2.8.7"
+  },
+  "scripts": {
+    "prettier": "prettier"
+  }
+}

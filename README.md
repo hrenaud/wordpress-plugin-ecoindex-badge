@@ -14,11 +14,15 @@ Comme d'habitude
 
 ## Utilisation
 
-Dès que l'extension est activée, le plugin est visible en bas de toutes les pages.
+### (v1.2.0)
 
-Dans la backoffice du site, une page de configuration est ajoutée et permet de sélectionner le thème du badge à utiliser `dark` or `light`.
+- Dans chaque page en front, le badge est visible dans la barre d'administration (si connecté) et permet au survol de faire apparaitre un bouton permettant de lancer la mesure.
 
-Vous retrouvez dans cette page des boutons mesurer qui déclanche l'API et la mesure. L'API n'est pas instantannée...
+### (v1.1.0)
+
+- Dès que l'extension est activée, le plugin est visible en bas de toutes les pages.
+- Dans la backoffice du site, une page de configuration est ajoutée et permet de sélectionner le thème du badge à utiliser `dark` or `light`. (v1.1.0)
+- Vous retrouvez dans cette page des boutons mesurer qui déclanche l'API et la mesure. L'API n'est pas instantannée...
 
 ## Visuels
 
