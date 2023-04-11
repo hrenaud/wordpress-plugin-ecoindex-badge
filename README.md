@@ -1,4 +1,4 @@
-# Ecoindex Badge for WordPress
+# Ecoindex Badge for WordPress - v1.2.1
 
 L'extension permet d'afficher le badge écoindex du GreenIT en bas de page.
 
@@ -7,6 +7,8 @@ Elle permet aussi de visualiser ses notes dans le backoffice :
 - Dans la liste des articles ;
 - Dans la liste des pages ;
 - Dans un récap des pages dans la page de gestion du plugin.
+
+[CHANGELOG](./CHANGELOG.md)
 
 ## Installation
 
