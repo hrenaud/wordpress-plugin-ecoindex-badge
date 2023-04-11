@@ -21,7 +21,7 @@
   },
   "scripts": {
     "prettier": "prettier",
-    "release": "release-it",
+    "release": "dotenv release-it",
     "husky": "husky",
     "postinstall": "husky install"
   }
