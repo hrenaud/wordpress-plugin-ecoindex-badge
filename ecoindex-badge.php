@@ -287,19 +287,22 @@ add_action('admin_menu', 'ecoindex_badge_menu');
 // Ajoute le badge Ecoindex en bas à gauche de chaque page du site
 function ecoindex_badge_add()
 {
-  $data_theme = get_option('ecoindex_badge_data_theme', 'light');
-  $theme = get_option('ecoindex_badge_theme');
-  $url = home_url($_SERVER['REQUEST_URI']);
-  echo '<a id="ecoindex-badge" href="https://bff.ecoindex.fr/redirect/?url=' .
-    add_trailing_slash($url) .
-    '" target="_blank">';
-  echo '<img src="https://bff.ecoindex.fr/badge/?theme=' .
-    $theme .
-    '&url=' .
-    add_trailing_slash($url) .
-    '" alt="Ecoindex Badge" />';
-  echo '</a>';
-  echo '<style>#ecoindex-badge {position: fixed; bottom: 10px; left: 10px;}</style>';
+  $post_id = get_queried_object_id();
+  if (get_post_status($post_id) == 'publish') {
+    $data_theme = get_option('ecoindex_badge_data_theme', 'light');
+    $theme = get_option('ecoindex_badge_theme');
+    $url = home_url($_SERVER['REQUEST_URI']);
+    echo '<a id="ecoindex-badge" href="https://bff.ecoindex.fr/redirect/?url=' .
+      add_trailing_slash($url) .
+      '" target="_blank">';
+    echo '<img src="https://bff.ecoindex.fr/badge/?theme=' .
+      $theme .
+      '&url=' .
+      add_trailing_slash($url) .
+      '" alt="Ecoindex Badge" />';
+    echo '</a>';
+    echo '<style>#ecoindex-badge {position: fixed; bottom: 10px; left: 10px;}</style>';
+  }
 }
 add_action('wp_footer', 'ecoindex_badge_add');
 
@@ -366,25 +369,31 @@ add_action('manage_posts_custom_column', 'ecoindex_badge_posts_content', 10, 2);
 // Cette methode ajoute le badge à la barre d'administration en front
 function ecoindex_badge_in_admin_bar()
 {
+  $page_id = get_queried_object_id();
+  if (get_post_status($page_id) == 'publish') {
+    $url = get_permalink($page_id);
+    if (empty($url)) {
+      $url = home_url();
+    }
+    $theme = get_option('ecoindex_badge_data_theme', 'light');
+    $badge_code =
+      '<a href="https://bff.ecoindex.fr/redirect/?url=' .
+      add_trailing_slash($url) .
+      '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' .
+      $theme .
+      '&url=' .
+      add_trailing_slash($url) .
+      '" alt="Ecoindex Badge" /></a>';
+    $page_title = 'Ecoindex';
+  } else {
+    $badge_code = 'Ecoindex N/A';
+    $page_title = 'Ecoindex non mesureable: page ou post non publié.';
+  }
   if (is_admin()) {
     return null;
   }
   global $wp_admin_bar;
-  $page_id = get_queried_object_id();
-  $page_title = 'Ecoindex';
-  $url = get_permalink($page_id);
-  if (empty($url)) {
-    $url = home_url();
-  }
-  $theme = get_option('ecoindex_badge_data_theme', 'light');
-  $badge_code =
-    '<a href="https://bff.ecoindex.fr/redirect/?url=' .
-    add_trailing_slash($url) .
-    '" target="_blank"><img src="https://bff.ecoindex.fr/badge/?theme=' .
-    $theme .
-    '&url=' .
-    add_trailing_slash($url) .
-    '" alt="Ecoindex Badge" /></a>';
+
   $wp_admin_bar->add_menu([
     'id' => 'badge_actuel',
     'title' => $badge_code,
@@ -399,11 +408,14 @@ add_action('wp_before_admin_bar_render', 'ecoindex_badge_in_admin_bar');
 // présent dans la barre d'administration.
 function add_mesure_to_ecoindex_badge_in_admin_bar()
 {
+  $page_id = get_queried_object_id();
+  if (get_post_status($page_id) != 'publish') {
+    return null;
+  }
   if (is_admin()) {
     return null;
   }
   global $wp_admin_bar;
-  $page_id = get_queried_object_id();
   $page_title = 'Ecoindex';
   $url = get_permalink($page_id);
   if (empty($url)) {
