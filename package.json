@@ -8,15 +8,16 @@
   "license": "MIT",
   "private": true,
   "devDependencies": {
-    "@prettier/plugin-php": "^0.19.4",
-    "@release-it/conventional-changelog": "^5.1.1",
-    "husky": "^8.0.3",
-    "prettier": "^2.8.7",
-    "release-it": "^15.10.1",
     "@commitlint/cli": "^17.5.1",
     "@commitlint/config-conventional": "^17.4.4",
+    "@prettier/plugin-php": "^0.19.4",
+    "@release-it/conventional-changelog": "^5.1.1",
     "conventional-changelog-conventionalcommits": "^5.0.0",
-    "eslint": "^8.38.0"
+    "dotenv-cli": "^7.2.1",
+    "eslint": "^8.38.0",
+    "husky": "^8.0.3",
+    "prettier": "^2.8.7",
+    "release-it": "^15.10.1"
   },
   "scripts": {
     "prettier": "prettier",
