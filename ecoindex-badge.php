@@ -3,7 +3,7 @@
 Plugin Name: Ecoindex Badge
 Plugin URI: https://novagia.fr/
 Description: Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.
-Version: 1.0
+Version: 1.2.3
 Author: Renaud Héluin @ NovaGaïa (https://ecoindex.fr/)
 Author URI: https://ecoindex.fr/
 License: GPL2
@@ -153,12 +153,12 @@ function ecoindex_measure_click_handler()
     ],
   ]);
 
-  if (is_wp_error($response)) {
-    $error_message = $response->get_error_message();
-    echo "Something went wrong: $error_message";
-    wp_die();
+  $response_code = wp_remote_retrieve_response_code($response);
+  if ($response_code == 429) {
+    echo 'You have reached the daily limit';
+  } elseif ($response_code == 422) {
+    echo 'Validation Error';
   } else {
-    // var_dump($response);
     $data = json_decode(wp_remote_retrieve_body($response));
     $taskId = $data;
 
@@ -177,7 +177,7 @@ function ecoindex_measure_scripts()
     'ecoindex-measure',
     plugin_dir_url(__FILE__) . 'js/ecoindex-measure.js',
     ['jquery'],
-    '1.0.0',
+    '1.2.11',
     true
   );
   wp_localize_script('ecoindex-measure', 'ecoindex_measure_params', [
@@ -290,13 +290,15 @@ function ecoindex_badge_add()
   $post_id = get_queried_object_id();
   if (get_post_status($post_id) == 'publish') {
     $data_theme = get_option('ecoindex_badge_data_theme', 'light');
-    $theme = get_option('ecoindex_badge_theme');
-    $url = home_url($_SERVER['REQUEST_URI']);
+    $url = get_permalink($page_id);
+    if (empty($url)) {
+      $url = home_url();
+    }
     echo '<a id="ecoindex-badge" href="https://bff.ecoindex.fr/redirect/?url=' .
       add_trailing_slash($url) .
       '" target="_blank">';
     echo '<img src="https://bff.ecoindex.fr/badge/?theme=' .
-      $theme .
+      $data_theme .
       '&url=' .
       add_trailing_slash($url) .
       '" alt="Ecoindex Badge" />';

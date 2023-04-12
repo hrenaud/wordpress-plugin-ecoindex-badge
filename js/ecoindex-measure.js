@@ -24,10 +24,22 @@ jQuery(document).ready(function ($) {
       success: function (response) {
         taskId = response;
         console.log('Task ID:', taskId);
-        checkMeasureStatus(taskId);
+        switch (taskId) {
+          case 'You have reached the daily limit':
+            alert(taskId);
+            break;
+
+          case 'Validation Error':
+            alert(taskId);
+            break;
+
+          default:
+            checkMeasureStatus(taskId);
+            break;
+        }
       },
       error: function (response) {
-        console.log(response);
+        console.warn(`response`, JSON.stringify(response));
         // Réactiver le bouton et changer son libellé
         button.prop('disabled', false);
         button.text('Mesurer');
@@ -43,15 +55,16 @@ jQuery(document).ready(function ($) {
           success: function (response) {
             console.log('Response:', response);
             if (response.status === 'SUCCESS') {
+              console.log(response.header);
               button.prop('disabled', false);
               button.text('Mesurer');
-              location.reload();
+              // location.reload();
             } else {
               setTimeout(checkMeasureStatus, 15000);
             }
           },
           error: function (xhr, ajaxOptions, thrownError) {
-            if (xhr.status === 422) {
+            if (xhr.status === 422 || xhr.status === 425) {
               button.prop('disabled', false);
               button.text('Mesurer');
               alert('Le nombre de requêtes pour ce domaine a été atteint.');
