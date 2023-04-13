@@ -3,7 +3,7 @@
 Plugin Name: Ecoindex Badge
 Plugin URI: https://novagia.fr/
 Description: Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.
-Version: 1.2.4
+Version: 1.2.5
 Author: Renaud Héluin @ NovaGaïa (https://ecoindex.fr/)
 Author URI: https://ecoindex.fr/
 License: GPL2
@@ -11,7 +11,7 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: ecoindex-badge
 */
 
-define('ECOINDEX_BADGE_VERSION', '1.2.4');
+define('ECOINDEX_BADGE_VERSION', '1.2.5');
 
 if (!class_exists('WP_List_Table')) {
   require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
