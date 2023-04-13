@@ -11,5 +11,26 @@
   },
   "hooks": {
     "after:bump": "npx auto-changelog -p"
+  },
+  "plugins": {
+    "@j-ulrich/release-it-regex-bumper": {
+      "out": [
+        {
+          "file": "README.md",
+          "search": "Version \\d+\\.\\d+\\.\\d+",
+          "replace": "Version {{version}}"
+        },
+        {
+          "file": "ecoindex-badge.php",
+          "search": "Version: \\d+\\.\\d+\\.\\d+",
+          "replace": "Version: {{version}}"
+        },
+        {
+          "file": "ecoindex-badge.php",
+          "search": "define('ECOINDEX_BADGE_VERSION', '\\d+\\.\\d+\\.\\d+');",
+          "replace": "define('ECOINDEX_BADGE_VERSION', '{{version}}');"
+        }
+      ]
+    }
   }
 }

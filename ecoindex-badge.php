@@ -11,6 +11,8 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: ecoindex-badge
 */
 
+define('ECOINDEX_BADGE_VERSION', '1.2.4');
+
 if (!class_exists('WP_List_Table')) {
   require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
 }
@@ -177,7 +179,7 @@ function ecoindex_measure_scripts()
     'ecoindex-measure',
     plugin_dir_url(__FILE__) . 'js/ecoindex-measure.js',
     ['jquery'],
-    '1.2.11',
+    ECOINDEX_BADGE_VERSION,
     true
   );
   wp_localize_script('ecoindex-measure', 'ecoindex_measure_params', [
