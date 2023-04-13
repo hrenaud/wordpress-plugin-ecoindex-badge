@@ -18,7 +18,7 @@
         {
           "file": "README.md",
           "search": "Version \\d+\\.\\d+\\.\\d+",
-          "replace": "Version {{newVersion}}"
+          "replace": "Version {{version}}"
         },
         {
           "file": "README.md",
@@ -28,12 +28,12 @@
         {
           "file": "ecoindex-badge.php",
           "search": "Version: \\d+\\.\\d+\\.\\d+",
-          "replace": "Version: {{newVersion}}"
+          "replace": "Version: {{version}}"
         },
         {
           "file": "ecoindex-badge.php",
           "search": "define('ECOINDEX_BADGE_VERSION', '[0-9.]*');",
-          "replace": "define('ECOINDEX_BADGE_VERSION', '{{newVersion}}');"
+          "replace": "define('ECOINDEX_BADGE_VERSION', '{{version}}');"
         }
       ]
     }
