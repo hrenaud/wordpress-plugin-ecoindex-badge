@@ -18,17 +18,22 @@
         {
           "file": "README.md",
           "search": "Version \\d+\\.\\d+\\.\\d+",
-          "replace": "Version {{version}}"
+          "replace": "Version {{newVersion}}"
+        },
+        {
+          "file": "README.md",
+          "search": "Updated \\d+\\-\\d+\\-\\d+",
+          "replace": "Updated {{now:yyyy-MM-dd}}"
         },
         {
           "file": "ecoindex-badge.php",
           "search": "Version: \\d+\\.\\d+\\.\\d+",
-          "replace": "Version: {{version}}"
+          "replace": "Version: {{newVersion}}"
         },
         {
           "file": "ecoindex-badge.php",
-          "search": "define('ECOINDEX_BADGE_VERSION', '\\d+\\.\\d+\\.\\d+');",
-          "replace": "define('ECOINDEX_BADGE_VERSION', '{{version}}');"
+          "search": "define('ECOINDEX_BADGE_VERSION', '[0-9.]*');",
+          "replace": "define('ECOINDEX_BADGE_VERSION', '{{newVersion}}');"
         }
       ]
     }
