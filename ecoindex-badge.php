@@ -63,7 +63,7 @@ class Ecoindex_Badge_List_Table extends WP_List_Table
     // Si la page d'accueil est une page statique
     if ('page' == get_option('show_on_front') && $front_page_id) {
       // Ajouter la page d'accueil à la liste
-      $pages[] = get_post($front_page_id);
+      // $pages[] = get_post($front_page_id);
     } else {
       // Si la page d'accueil est la page des derniers articles
       // Ajouter un faux objet pour représenter la page d'accueil
@@ -292,7 +292,7 @@ function ecoindex_badge_add()
   $post_id = get_queried_object_id();
   if (get_post_status($post_id) == 'publish') {
     $data_theme = get_option('ecoindex_badge_data_theme', 'light');
-    $url = get_permalink($page_id);
+    $url = get_permalink($post_id);
     if (empty($url)) {
       $url = home_url();
     }
