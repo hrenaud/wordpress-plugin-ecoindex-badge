@@ -6,7 +6,7 @@ jQuery(document).ready(function ($) {
     var url = $(this).attr('data-page-url');
     var width = 1920;
     var height = 1080;
-    console.log('clicked', url);
+    console.log('Looking for', url);
     button = $(this);
     button.prop('disabled', true);
     button.text('Mesure en cours...');
@@ -35,6 +35,7 @@ jQuery(document).ready(function ($) {
 
           default:
             checkMeasureStatus(taskId);
+            nb_try_mesure = 3;
             break;
         }
       },
@@ -46,8 +47,19 @@ jQuery(document).ready(function ($) {
       },
     });
 
+    let nb_try_mesure = 4;
+
     function checkMeasureStatus() {
-      console.log(`checkMeasureStatus for`, taskId);
+      nb_try_mesure--;
+      if (nb_try_mesure === 0) {
+        alert(
+          'Un problème est survenue dans la mesure, veuillez réésayer plus tard.'
+        );
+        button.prop('disabled', false);
+        button.text('Mesurer');
+        return;
+      }
+      console.log(`checkMeasureStatus for`, taskId, `try`, nb_try_mesure);
       setTimeout(function () {
         $.ajax({
           type: 'GET',
@@ -55,10 +67,10 @@ jQuery(document).ready(function ($) {
           success: function (response) {
             console.log('Response:', response);
             if (response.status === 'SUCCESS') {
-              console.log(response.header);
+              // console.log(response.header);
               button.prop('disabled', false);
               button.text('Mesurer');
-              // location.reload();
+              location.reload();
             } else {
               setTimeout(checkMeasureStatus, 15000);
             }

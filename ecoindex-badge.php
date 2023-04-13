@@ -403,6 +403,7 @@ function ecoindex_badge_in_admin_bar()
     'title' => $badge_code,
     'meta' => [
       'title' => $page_title,
+      'target' => '_blank',
     ],
   ]);
 }
