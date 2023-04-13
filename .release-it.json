@@ -32,7 +32,7 @@
         },
         {
           "file": "ecoindex-badge.php",
-          "search": "'ECOINDEX_BADGE_VERSION', '\\d+\\-\\d+\\-\\d+'",
+          "search": "'ECOINDEX_BADGE_VERSION', '([0-9.]+)'",
           "replace": "'ECOINDEX_BADGE_VERSION', '{{version}}'"
         }
       ]
