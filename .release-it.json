@@ -32,8 +32,8 @@
         },
         {
           "file": "ecoindex-badge.php",
-          "search": "define('ECOINDEX_BADGE_VERSION', '[0-9.]*');",
-          "replace": "define('ECOINDEX_BADGE_VERSION', '{{version}}');"
+          "search": "'ECOINDEX_BADGE_VERSION', '\\d+\\-\\d+\\-\\d+'",
+          "replace": "'ECOINDEX_BADGE_VERSION', '{{version}}'"
         }
       ]
     }
