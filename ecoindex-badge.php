@@ -98,6 +98,7 @@ class Ecoindex_Badge_List_Table extends WP_List_Table
 
   function column_default($item, $column_name)
   {
+    $hasRemaningMesure = has_remaining_daily_requests();
     switch ($column_name) {
       case 'type':
         return get_post_type($item);
@@ -106,27 +107,22 @@ class Ecoindex_Badge_List_Table extends WP_List_Table
       case 'lien':
         return '<a href=' . esc_url(get_permalink($item->ID)) . '>Voir</a>';
       case 'ecoindex':
-        return ecoindex_badge_render_column('Ecoindex', $item->ID);
+        return ecoindex_badge_render_column(
+          'Ecoindex',
+          $item->ID,
+          $hasRemaningMesure
+        );
       case 'mesurer':
-        return ecoindex_badge_render_column('Mesurer', $item->ID);
+        return ecoindex_badge_render_column(
+          'Mesurer',
+          $item->ID,
+          $hasRemaningMesure
+        );
       default:
         return print_r($item, true); //Show the whole array for troubleshooting purposes
     }
   }
 }
-
-// function my_add_menu_items(){
-//     add_menu_page( 'My Plugin List Table', 'My List Table Example', 'activate_plugins', 'my_list_test', 'my_render_list_page' );
-// }
-// add_action( 'admin_menu', 'my_add_menu_items' );
-
-// function my_render_list_page(){
-//   $myListTable = new Ecoindex_Badge_List_Table();
-//   echo '<div class="wrap"><h2>My List Table Test</h2>';
-//   $myListTable->prepare_items();
-//   $myListTable->display();
-//   echo '</div>';
-// }
 
 // Cette fonction ajoute un slash à la fin de l'URL si celui-ci n'existe pas.
 function add_trailing_slash($url)
@@ -135,6 +131,35 @@ function add_trailing_slash($url)
     $url .= '/';
   }
   return $url;
+}
+
+// Cette fonction, utilisant la méthode `get_remaining_daily_requests()` retourne un boolean indiquant si oui ou non, il en reste.
+function has_remaining_daily_requests()
+{
+  $remaningMesure = get_remaining_daily_requests();
+  $hasRemaningMesure = false;
+  if (0 < $remaningMesure) {
+    $hasRemaningMesure = true;
+  }
+  return $hasRemaningMesure;
+}
+
+// Cette fonction demande à l'API le nombre restant de mesure pour la journée
+// changement à 00h00
+function get_remaining_daily_requests()
+{
+  $host = $_SERVER['HTTP_HOST'];
+  $url = "https://bff.ecoindex.fr/api/hosts/{$host}";
+  $response = wp_remote_get($url);
+  if (is_wp_error($response)) {
+    return null;
+  }
+  $body = wp_remote_retrieve_body($response);
+  $data = json_decode($body);
+  if (!isset($data->remaining_daily_requests)) {
+    return null;
+  }
+  return $data->remaining_daily_requests;
 }
 
 // Cette fonction gère la requête AJAX pour envoyer les données de mesure de l'empreinte environnementale d'une page ou d'un article, en utilisant l'API Ecoindex. Les données envoyées sont l'URL de la page, la largeur et la hauteur de la fenêtre de visualisation, et la fonction renvoie l'ID de la tâche Ecoindex correspondante.
@@ -191,8 +216,11 @@ add_action('admin_enqueue_scripts', 'ecoindex_measure_scripts');
 add_action('wp_enqueue_scripts', 'ecoindex_measure_scripts');
 
 // Cette fonction affiche soit un badge Ecoindex, soit un bouton "Mesurer" pour une colonne donnée dans une liste de publication WordPress.
-function ecoindex_badge_render_column($column_name, $post_id)
-{
+function ecoindex_badge_render_column(
+  $column_name,
+  $post_id,
+  $hasRemaningMesure
+) {
   if ($column_name == 'Ecoindex') {
     $url = get_permalink($post_id);
     if (empty($url)) {
@@ -213,7 +241,9 @@ function ecoindex_badge_render_column($column_name, $post_id)
     if (empty($url)) {
       $url = home_url();
     }
-    echo '<button class="button button-primary ecoindex-measure-button" data-page-url="' .
+    echo '<button class="button button-primary ecoindex-measure-button" ' .
+      (!$hasRemaningMesure ? 'disabled' : '') .
+      ' data-page-url="' .
       add_trailing_slash(esc_url($url)) .
       '">Mesurer</button>';
   }
@@ -222,9 +252,17 @@ function ecoindex_badge_render_column($column_name, $post_id)
 // Cette fonction génère la page des paramètres du plugin Ecoindex Badge, affiche une liste de toutes les pages et articles du site avec leur titre, leur lien, leur score Ecoindex et un bouton pour mesurer leur impact environnemental.
 function ecoindex_badge_settings_page()
 {
-  $myListTable = new Ecoindex_Badge_List_Table(); ?>
+  $remaningMesure = get_remaining_daily_requests();
+  $hasRemaningMesure = false;
+  if (0 < $remaningMesure) {
+    $hasRemaningMesure = true;
+  }
+  $myListTable = new Ecoindex_Badge_List_Table();
+  $myListTable->hasRemaningMesure = $hasRemaningMesure;
+  ?>
     <div class="wrap">
         <h1><?php echo esc_html(get_admin_page_title()); ?></h1>
+        <p><strong>Nombre de mesure encore possible aujourd'hui :</strong> <?php echo $remaningMesure; ?></p>
         <form method="post" action="options.php">
             <?php settings_fields('ecoindex_badge_settings_group'); ?>
             <?php do_settings_sections('ecoindex_badge_settings_page'); ?>
@@ -232,7 +270,7 @@ function ecoindex_badge_settings_page()
         </form>
          <h2>Liste des pages et articles</h2>
          <?php
-         $myListTable->prepare_items();
+         $myListTable->prepare_items($hasRemaningMesure);
          $myListTable->display();?>
     </div>
     <?php
@@ -426,16 +464,34 @@ function add_mesure_to_ecoindex_badge_in_admin_bar()
   if (empty($url)) {
     $url = home_url();
   }
-  $mesurer_code =
-    '<a class="ecoindex-measure-button" data-page-url="' .
-    add_trailing_slash(esc_url($url)) .
-    '">Mesurer</a>';
+  $hasRemaningMesure = has_remaining_daily_requests();
+  if ($hasRemaningMesure) {
+    $mesurer_code =
+      '<style>.ecoindex-measure-button--adminbar--wrapper .ab-item.ab-empty-item{padding:0!important;}</style>' .
+      '<a role="link" style="cursor: pointer" class="ecoindex-measure-button" data-page-url="' .
+      add_trailing_slash(esc_url($url)) .
+      '">Mesurer</a>';
+  } else {
+    $mesurer_code =
+      '<style>.ecoindex-measure-button--adminbar--wrapper .ab-item.ab-empty-item{padding:0!important;}</style>' .
+      '<a role="link">Mesurer (nombre de mesure du jour dépassé)</a>';
+  }
   $wp_admin_bar->add_node([
     'id' => 'mesurer_page',
     'parent' => 'badge_actuel',
     'title' => $mesurer_code,
     'meta' => [
       'title' => $page_title,
+      'class' => 'ecoindex-measure-button--adminbar--wrapper',
+    ],
+  ]);
+  $wp_admin_bar->add_node([
+    'id' => 'admin_plugin',
+    'parent' => 'badge_actuel',
+    'title' => 'Administration du plugin',
+    'href' => esc_url(admin_url('admin.php?page=ecoindex-badge')),
+    'meta' => [
+      'title' => 'Administration du plugin',
     ],
   ]);
 }
