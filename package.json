@@ -1,6 +1,6 @@
 {
   "name": "ecoindex-badge",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.",
   "main": "ecoindex-badge.php",
   "repository": "https://github.com/hrenaud/wordpress-plugin-ecoindex-badge.git",
