@@ -1,6 +1,6 @@
 # Ecoindex Badge for WordPress
 
-Version 1.2.8
+Version 1.2.9
 
 Updated 2023-05-24
 
