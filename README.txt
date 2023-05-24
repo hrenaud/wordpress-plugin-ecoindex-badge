@@ -5,7 +5,7 @@ Tags: ecoindex, greenit, ecoscore, performance
 Requires at least: 4.0
 Tested up to: 4.9.5
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 1.2.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,7 +21,7 @@ Elle permet aussi de visualiser ses notes dans le backoffice et de délencher la
 - Dans la liste des pages ;
 - Dans un récap des pages dans la page de gestion du plugin.
 
-Updated 2023-04-20
+Updated 2023-05-24
 
 == Frequently Asked Questions ==
 

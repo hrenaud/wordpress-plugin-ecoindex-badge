@@ -1,8 +1,8 @@
 # Ecoindex Badge for WordPress
 
-Version 1.2.7
+Version 1.2.8
 
-Updated 2023-04-20
+Updated 2023-05-24
 
 L'extension permet d'afficher le badge écoindex du GreenIT en bas de page.
 
