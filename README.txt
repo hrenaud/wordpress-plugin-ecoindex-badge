@@ -1,6 +1,6 @@
-=== Badge Ecoindex for WordPress ===
+=== Badge Ecoindex du GreenIT ===
 Contributors: novagaia
-Donate link: https://www.monsite.com
+Donate link: https://collectif.greenit.fr
 Tags: ecoindex, greenit, ecoscore, performance
 Requires at least: 5.0
 Tested up to: 6.2.2

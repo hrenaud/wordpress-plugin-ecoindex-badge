@@ -1,4 +1,4 @@
-# Ecoindex Badge for WordPress
+# Badge Ecoindex du GreenIT
 
 Version 1.2.9
 

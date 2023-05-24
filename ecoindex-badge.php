@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: Badge Ecoindex pour WordPress
-Plugin URI: https://novagia.fr/
+Plugin Name: Badge Ecoindex du GreenIT
+Plugin URI: https://github.com/hrenaud/wordpress-plugin-ecoindex-badge/
 Description: Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.
 Version: 1.2.9
-Author: Renaud Héluin @ NovaGaïa (https://ecoindex.fr/)
+Author: Renaud Héluin @ NovaGaïa (https://novagaia.fr/)
 Author URI: https://ecoindex.fr/
 License: MIT
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
