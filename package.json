@@ -1,11 +1,11 @@
 {
   "name": "ecoindex-badge",
   "version": "1.2.7",
-  "description": "Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.",
+  "description": "Ecoindex Badge for WordPress. Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.",
   "main": "ecoindex-badge.php",
   "repository": "https://github.com/hrenaud/wordpress-plugin-ecoindex-badge.git",
   "author": "Renaud Heluin <renaud.heluin@novagaia.fr>",
-  "license": "MIT",
+  "license": "GPLv2",
   "private": true,
   "devDependencies": {
     "@commitlint/cli": "^17.5.1",

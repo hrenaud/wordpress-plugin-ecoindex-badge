@@ -34,16 +34,16 @@ Comme d'habitude
 
 ### Badge dans les pages
 
-![Badge dans les pages](./docs/Capture-2023-04-05-142657.png)
+![Badge dans les pages](./assets/screenshot-1.png)
 
 ### Badge dans la liste des articles
 
-![Badge dans la liste des articles](./docs/Capture-2023-04-05-142814.png)
+![Badge dans la liste des articles](./assets/screenshot-2.png)
 
 ### Badge dans la liste des pages
 
-![Badge dans la liste des pages](./docs/Capture-2023-04-05-142748.png)
+![Badge dans la liste des pages](./assets/screenshot-3.png)
 
 ### Page de configuration de l'extension
 
-![Page de configuration de l'extension](./docs/Capture-2023-04-05-142847.png)
+![Page de configuration de l'extension](./assets/screenshot-4.png)

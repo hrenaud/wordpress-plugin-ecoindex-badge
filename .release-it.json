@@ -16,6 +16,16 @@
     "@j-ulrich/release-it-regex-bumper": {
       "out": [
         {
+          "file": "README.txt",
+          "search": "Stable tag: \\d+\\.\\d+\\.\\d+",
+          "replace": "Stable tag: {{version}}"
+        },
+        {
+          "file": "README.txt",
+          "search": "Updated \\d+\\-\\d+\\-\\d+",
+          "replace": "Updated {{now:yyyy-MM-dd}}"
+        },
+        {
           "file": "README.md",
           "search": "Version \\d+\\.\\d+\\.\\d+",
           "replace": "Version {{version}}"
