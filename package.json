@@ -1,6 +1,6 @@
 {
   "name": "wordpress-plugin-ecoindex-badge",
-  "version": "1.2.9",
+  "version": "1.2.10",
   "description": "Badge Ecoindex du GreenIT. Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.",
   "main": "ecoindex-badge.php",
   "repository": "https://github.com/hrenaud/wordpress-plugin-ecoindex-badge.git",

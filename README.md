@@ -1,6 +1,6 @@
 # Badge Ecoindex du GreenIT
 
-Version 1.2.9
+Version 1.2.10
 
 Updated 2023-05-24
 
