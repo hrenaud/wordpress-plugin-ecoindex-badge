@@ -6,6 +6,8 @@ Updated 2023-05-24
 
 L'extension permet d'afficher le badge écoindex du GreenIT en bas de page.
 
+Elle se base sur l'API EcoIndex https://ecoindex.fr.
+
 Elle permet aussi de visualiser ses notes dans le backoffice :
 
 - Dans la liste des articles ;

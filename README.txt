@@ -1,9 +1,9 @@
-=== Badge Ecoindex pour WordPress ===
+=== Badge Ecoindex for WordPress ===
 Contributors: novagaia
 Donate link: https://www.monsite.com
 Tags: ecoindex, greenit, ecoscore, performance
-Requires at least: 4.0
-Tested up to: 4.9.5
+Requires at least: 5.0
+Tested up to: 6.2.2
 Requires PHP: 7.4
 Stable tag: 1.2.8
 License: GPLv2 or later
@@ -14,6 +14,8 @@ L'extension permet d'afficher le badge écoindex du GreenIT en bas de page.
 == Description ==
 
 L'extension permet d'afficher le badge écoindex du GreenIT en bas de page.
+
+Elle se base sur l'API EcoIndex https://ecoindex.fr
 
 Elle permet aussi de visualiser ses notes dans le backoffice et de délencher la mesure via l'API officielle EcoIndex du GreenIT :
 

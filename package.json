@@ -4,7 +4,24 @@
   "description": "Ecoindex Badge for WordPress. Ce plugin ajoute le badge Ecoindex en bas de pages de votre site.",
   "main": "ecoindex-badge.php",
   "repository": "https://github.com/hrenaud/wordpress-plugin-ecoindex-badge.git",
-  "author": "Renaud Heluin <renaud.heluin@novagaia.fr>",
+  "author": "Renaud Heluin <renaud.heluin@novagaia.fr> (https://novagaia.fr)",
+  "contributors": [
+    {
+      "name": "CNUMR",
+      "url": "https://github.com/cnumr"
+    },
+    {
+      "name": "Collectif GreenIT",
+      "url": "https://collectif.greenit.fr/"
+    }
+  ],
+  "keywords": [
+    "ecoindex",
+    "greenit",
+    "ecoscore",
+    "performance",
+    "draggable"
+  ],
   "license": "GPLv2",
   "private": true,
   "devDependencies": {
